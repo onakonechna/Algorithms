@@ -1,9 +1,11 @@
-class UnionByRank {
+class UnionByRank_PathCompress {
   //space O(N)
   parents: number[] = [];
   ranks: number[] = [];
 
-  //O(N)
+  //O(α(N)) on average
+  //α refers to the Inverse Ackermann function. 
+  //In practice, we assume it's a constant. In other words, O(α(N)) is regarded as O(1) on average.
   constructor(size: number) {
     for (let i = 1; i < size; i++) {
       this.parents[i] = i;
@@ -11,13 +13,17 @@ class UnionByRank {
     }
   }
 
-  //O(logN)
+  //O(α(N)) on average
   find(i: number) {
     if (this.parents[i] === i) return i;
-    return this.find(this.parents[i]);
+
+    const root = this.find(this.parents[i]);
+    this.parents[i] = root;// Path Compression optimization, change parent to root on way back
+    // thus next find call on this node will be O(1)
+    return root;
   }
 
-  //O(logN)
+  //O(α(N)) on average
   union(i: number, j: number) {
     const iRoot = this.find(i);
     const jRoot = this.find(j);
